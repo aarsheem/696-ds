@@ -10,7 +10,7 @@
 
 ## Cooperative Inverse RL:
 * Inverse RL(IRL): Estimate the reward function from demontration and try to maximize it.
-* Cooperative IRL(CIRL): Cooperative game of a human and robot where only human sees the reward. By observing the human, robot estimates the reward and takes action which will help it to maximize the sum of rewards.
+* Cooperative IRL(CIRL): Cooperative game of a human and robot where only human *knows* the *reward function*. By observing the human, robot estimates the reward and takes action which will help it to maximize the sum of rewards.
 * Apprenticeship Learning(ACIRL): Can be modelled as a CIRL game with two phases:
   * Learning Phase: Only human takes action
   * Deployment Phase: Only robot takes action
