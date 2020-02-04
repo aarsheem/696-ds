@@ -9,7 +9,8 @@
 *A deep RL framework for solving continious control problems using DPG.*
 
 ## Cooperative Inverse RL:
-* Inverse RL(IRL): Estimate the reward function from demontration and try to maximize it.
+* Model based algorithm
+* Inverse RL(IRL): Estimate the reward function from demontration and try to maximize it. Usually a model based algorithm.
 * Cooperative IRL(CIRL): Cooperative game of a human and robot where only human *knows* the *reward function*. By observing the human, robot estimates the reward and takes action which will help it to maximize the sum of rewards.
 * Apprenticeship Learning(ACIRL): Can be modelled as a CIRL game with two phases:
   * Learning Phase: Only human takes action
@@ -29,3 +30,7 @@
 
 ## On the Utility of Learning about Humans for Human-AI Coordination:
 *In training for cooperative games using AI, we should include human models. Self-play or imitation can fail drastically in such scenarios.*
+
+## An Efficient, Generalized Bellman Update For Cooperative Inverse Reinforcement Learning:
+* Exponential redction in the size of action space for CIRL.
+* Relax the assumption of human rationality
