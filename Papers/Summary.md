@@ -34,3 +34,12 @@
 ## An Efficient, Generalized Bellman Update For Cooperative Inverse Reinforcement Learning:
 * Exponential redction in the size of action space for CIRL.
 * Relax the assumption of human rationality
+
+## Maximum Entropy Inverse Reinforcement Learning
+* Model reward function as a linear features of states
+* Get the gradient of Maximum Likelihood of the reward, and maximize it using Gradient Descent
+
+## Shared Autonomy via Deep RL
+* Shared Action space based end-to-end model free human in the loop RL framework
+* Pre-trained agent. Final action depends on the agent.
+* Agent let human take action if value is close to the optimal value.
