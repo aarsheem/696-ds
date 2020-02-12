@@ -36,7 +36,7 @@ models -
 
 notebooks -
     Notebook for training models
-    lunar_dqn_mirror - trains two agents (one that controls left, right and one that controls up)
+    lunar_dqn_mirror - trains two agents (DQN) (one that controls left, right and one that controls up)
     lunarlander_baselne_regular - trains "human model" from recorded gameplay data
     lunarlander_baseline_rnn - incomplete
 
@@ -47,8 +47,11 @@ src -
         cartpole_mirror - trains two agents for cartpole game
         cartpole_prod - agent controls left, human controls right
         cartpole_self - two agent plays by themselves
-    lunar lander (outdated)- 
-        ddpg_two_bot - trains agent to play lunar lander 
+    lunar lander - 
+        ddpg_two_bot - 
+            ddpg_torch.py - defines the actor-critic network
+            train.py - trains two agent(s) (DDPG) to play lunar lander 
+            
     other/
         utils, lunarlander gameplay recorder
 
