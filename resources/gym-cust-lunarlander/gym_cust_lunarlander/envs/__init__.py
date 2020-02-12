@@ -1,0 +1,2 @@
+from gym_cust_lunarlander.envs.lunarlander import LunarLanderCust
+from gym_cust_lunarlander.envs.lunarlander import LunarLanderCustContinuous
