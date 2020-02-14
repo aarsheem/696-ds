@@ -94,7 +94,7 @@ class CriticNetwork(nn.Module):
         #self.q.bias.data.uniform_(-f3, f3)
 
         self.optimizer = optim.Adam(self.parameters(), lr=beta)
-        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cuda:1')
+        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
 
         self.to(self.device)
 
@@ -116,7 +116,7 @@ class CriticNetwork(nn.Module):
 
     def load_checkpoint(self,run=0):
         print('... loading checkpoint ...')
-        self.load_state_dict(T.load(self.checkpoint_file+str(run)))
+        self.load_state_dict(T.load(self.checkpoint_file+str(run), map_location=lambda storage, loc: storage))
 
 class ActorNetwork(nn.Module):
     def __init__(self, alpha, input_dims, fc1_dims, fc2_dims, n_actions, name,
@@ -153,7 +153,7 @@ class ActorNetwork(nn.Module):
         #self.mu.bias.data.uniform_(-f3, f3)
 
         self.optimizer = optim.Adam(self.parameters(), lr=alpha)
-        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cuda:1')
+        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
 
         self.to(self.device)
 
@@ -174,7 +174,7 @@ class ActorNetwork(nn.Module):
 
     def load_checkpoint(self,run=0):
         print('... loading checkpoint ...')
-        self.load_state_dict(T.load(self.checkpoint_file+str(run)))
+        self.load_state_dict(T.load(self.checkpoint_file+str(run), map_location=lambda storage, loc: storage))
 
 class Agent(object):
     def __init__(self, name, alpha, beta, input_dims, tau, env, gamma=0.99,
@@ -208,7 +208,7 @@ class Agent(object):
         self.actor.eval()
        # human_action = T.from_numpy(human_action).float().to(self.actor.device)
         observation = T.tensor(observation, dtype=T.float).to(self.actor.device)
-        
+
         mu = self.actor.forward(observation).to(self.actor.device)
         mu_prime = mu + T.tensor(self.noise(),
                                  dtype=T.float).to(self.actor.device)
