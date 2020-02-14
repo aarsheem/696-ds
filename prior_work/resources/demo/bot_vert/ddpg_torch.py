@@ -116,7 +116,7 @@ class CriticNetwork(nn.Module):
 
     def load_checkpoint(self,run=0):
         print('... loading checkpoint ...')
-        self.load_state_dict(T.load(self.checkpoint_file+str(run)))
+        self.load_state_dict(T.load(self.checkpoint_file+str(run), map_location=lambda storage, loc: storage))
 
 class ActorNetwork(nn.Module):
     def __init__(self, alpha, input_dims, fc1_dims, fc2_dims, n_actions, name,
@@ -174,7 +174,7 @@ class ActorNetwork(nn.Module):
 
     def load_checkpoint(self,run=0):
         print('... loading checkpoint ...')
-        self.load_state_dict(T.load(self.checkpoint_file+str(run)))
+        self.load_state_dict(T.load(self.checkpoint_file+str(run), map_location=lambda storage, loc: storage))
 
 class Agent(object):
     def __init__(self, name, alpha, beta, input_dims, tau, env, gamma=0.99,
