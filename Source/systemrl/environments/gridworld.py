@@ -7,7 +7,7 @@ class Gridworld(Environment):
     """
     The Gridworld as described in the lecture notes of the 687 course material.
 
-    Actions: up (0), down (1), left (2), right (3)
+    Actions: up (0), down (1), left (2), right (3), do nothing (4)
 
     Environment Dynamics: With probability 0.8 the robot moves in the specified
         direction. With probability 0.05 it gets confused and veers to the
@@ -20,7 +20,8 @@ class Gridworld(Environment):
         If the movement defined by these dynamics would cause the agent to
         exit the grid (e.g., move up when next to the top wall), then the
         agent does not move. The robot starts in the top left corner, and the
-        process ends in the bottom right corner.
+        process ends in the bottom right corner. When the action is do nothing(4)
+        robot always stays at the same place.
 
     Rewards: -10 for entering the state with water
             +10 for entering the goal state
@@ -29,7 +30,7 @@ class Gridworld(Environment):
 
     def __init__(self, startState=0, endState=24, shape=(5, 5), obstacles=(12, 17), waterStates=(6, 18, 22)):
         self._name = "Gridworld"
-        #todo
+        #todo: what is gamma for?
         self._gamma = 0.99
         self._startState = startState
         self._endState = endState
@@ -46,7 +47,6 @@ class Gridworld(Environment):
         self._R = self._initR()  # dict mapping states to rewards
 
         # define stochasticity
-        #todo
         self._prStay = 0.1
         self._prRotate = 0.05
         # dicts mapping actions to the appropriate rotations
@@ -80,7 +80,7 @@ class Gridworld(Environment):
 
     def nextState(self, state: int, action: int) -> int:
 
-        if state == self._endState:
+        if state == self._endState or action == 4:
             return state
 
         noise = np.random.uniform()
