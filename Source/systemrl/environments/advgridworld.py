@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import os
 
 class AdvGridworld:
 
@@ -17,7 +18,7 @@ class AdvGridworld:
         self.getGrid(1)
         self._name = "Advanced Gridworld"
         self._action = None
-        self._gamma = 1
+        self._gamma = 0.9
 
     @property
     def name(self) -> str:
@@ -29,6 +30,7 @@ class AdvGridworld:
     information that is required to play.
     '''
     def getGrid(self, selection):
+        os.chdir(os.path.split(__file__)[0])
         fileName = ""
         if selection == 1:
             fileName = "grids/gridworld1.p"
@@ -76,7 +78,7 @@ class AdvGridworld:
     7 - Up+Left
     '''
     def step(self, action):
-        print(self.state)
+        #print(self.state)
         stepReward = 0
         self._action = action
         actionCheck = self.movements[action]
@@ -155,6 +157,9 @@ class AdvGridworld:
     @property
     def gamma(self) -> float:
         return self._gamma
+
+    def getBoardDim(self):
+        return self.boardDim
 
     def numActions(self):
         return 7
