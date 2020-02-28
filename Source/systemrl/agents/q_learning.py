@@ -24,5 +24,9 @@ class QLearning(TD):
         self.q_table[state][action] += self.lr*(reward + self.gamma*self.q_table\
                 [next_state][next_action] - self.q_table[state][action])
 
+    def get_q_values(self, state):
+        qsa = self.q_table[state]
+        return qsa
+
     def reset(self):
         pass
