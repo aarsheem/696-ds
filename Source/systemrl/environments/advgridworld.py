@@ -111,7 +111,7 @@ class AdvGridworld:
             #Down and Left
             elif action == 6:
                 curState = self._currentState
-                newState = [curState[0] + 1, curState[1] - 1]
+                newState = [curState[0] - 1, curState[1] + 1]
             #Up and Left
             elif action == 7:
                 curState = self._currentState
