@@ -18,7 +18,8 @@ class AdvGridworld:
         self.getGrid(1)
         self._name = "Advanced Gridworld"
         self._action = None
-        self._gamma = 0.9
+        self._gamma = 0.95
+        self._numSteps = 0
 
     @property
     def name(self) -> str:
@@ -118,7 +119,8 @@ class AdvGridworld:
                 newState = [curState[0] - 1, curState[1] - 1]
             self._currentState = newState
             stepReward = self.rewardCheck()
-            self._rewards += stepReward
+            self._rewards += stepReward * (self._gamma**self._numSteps)
+            self._numSteps += 1
         if self._currentState == self.endState:
             self._inTerminal = True
         return self._currentState, stepReward, self._inTerminal
@@ -162,7 +164,7 @@ class AdvGridworld:
         return self.boardDim
 
     def numActions(self):
-        return 7
+        return 8
 
     '''
     reset resets the grid to the original start position, removes any rewards, and sets terminal check status to false.
@@ -172,3 +174,4 @@ class AdvGridworld:
         self._rewards = 0
         self._inTerminal = False
         self._action = None
+        self._numSteps = 0
