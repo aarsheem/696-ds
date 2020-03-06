@@ -120,7 +120,7 @@ class AdvGridworld:
             self._currentState = newState
             stepReward = self.rewardCheck()
             self._rewards += stepReward * (self._gamma**self._numSteps)
-            self._numSteps += 1
+        self._numSteps += 1
         if self._currentState == self.endState:
             self._inTerminal = True
         return self._currentState, stepReward, self._inTerminal
@@ -159,6 +159,10 @@ class AdvGridworld:
     @property
     def gamma(self) -> float:
         return self._gamma
+
+    @property
+    def numSteps(self) -> int:
+        return self._numSteps
 
     def getBoardDim(self):
         return self.boardDim
