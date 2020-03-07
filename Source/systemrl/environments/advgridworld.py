@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import pathlib
 
 class AdvGridworld:
 
@@ -29,9 +30,10 @@ class AdvGridworld:
     information that is required to play.
     '''
     def getGrid(self, selection):
+        current_path = str(pathlib.Path(__file__).parent.absolute())
         fileName = ""
         if selection == 1:
-            fileName = "grids/gridworld1.p"
+            fileName = current_path + "/grids/gridworld1.p"
         elif selection == 2:
             fileName = "grids/gridworld2.p" #TODO: implement
         else:
@@ -76,7 +78,6 @@ class AdvGridworld:
     7 - Up+Left
     '''
     def step(self, action):
-        print(self.state)
         stepReward = 0
         self._action = action
         actionCheck = self.movements[action]

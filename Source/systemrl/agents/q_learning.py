@@ -24,5 +24,12 @@ class QLearning(TD):
         self.q_table[state][action] += self.lr*(reward + self.gamma*self.q_table\
                 [next_state][next_action] - self.q_table[state][action])
 
+    def get_policy(self):
+        #"one" optimal deterministic policy
+        policy = {}
+        for s in self.q_table:
+            policy[s] = np.argmax(self.q_table[s])
+        return policy
+
     def reset(self):
         pass
