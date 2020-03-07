@@ -31,5 +31,9 @@ class QLearning(TD):
             policy[s] = np.argmax(self.q_table[s])
         return policy
 
+    def get_q_values(self, state):
+        qsa = self.q_table[state]
+        return qsa
+
     def reset(self):
         pass

@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-import pathlib
+import os
 
 class AdvGridworld:
 
@@ -18,7 +18,8 @@ class AdvGridworld:
         self.getGrid(1)
         self._name = "Advanced Gridworld"
         self._action = None
-        self._gamma = 1
+        self._gamma = 0.95
+        self._numSteps = 0
 
     @property
     def name(self) -> str:
@@ -30,10 +31,10 @@ class AdvGridworld:
     information that is required to play.
     '''
     def getGrid(self, selection):
-        current_path = str(pathlib.Path(__file__).parent.absolute())
+        os.chdir(os.path.split(__file__)[0])
         fileName = ""
         if selection == 1:
-            fileName = current_path + "/grids/gridworld1.p"
+            fileName = "/grids/gridworld1.p"
         elif selection == 2:
             fileName = "grids/gridworld2.p" #TODO: implement
         else:
@@ -102,7 +103,7 @@ class AdvGridworld:
             #Up and Right
             elif action == 4:
                 curState = self._currentState
-                newState = [curState[0] - 1, curState[1] + 1]
+                newState = [curState[0] + 1, curState[1] - 1]
             #Down and Right
             elif action == 5:
                 curState = self._currentState
@@ -110,14 +111,15 @@ class AdvGridworld:
             #Down and Left
             elif action == 6:
                 curState = self._currentState
-                newState = [curState[0] + 1, curState[1] - 1]
+                newState = [curState[0] - 1, curState[1] + 1]
             #Up and Left
             elif action == 7:
                 curState = self._currentState
                 newState = [curState[0] - 1, curState[1] - 1]
             self._currentState = newState
             stepReward = self.rewardCheck()
-            self._rewards += stepReward
+            self._rewards += stepReward * (self._gamma**self._numSteps)
+        self._numSteps += 1
         if self._currentState == self.endState:
             self._inTerminal = True
         return self._currentState, stepReward, self._inTerminal
@@ -157,8 +159,15 @@ class AdvGridworld:
     def gamma(self) -> float:
         return self._gamma
 
+    @property
+    def numSteps(self) -> int:
+        return self._numSteps
+
+    def getBoardDim(self):
+        return self.boardDim
+
     def numActions(self):
-        return 7
+        return 8
 
     '''
     reset resets the grid to the original start position, removes any rewards, and sets terminal check status to false.
@@ -168,3 +177,4 @@ class AdvGridworld:
         self._rewards = 0
         self._inTerminal = False
         self._action = None
+        self._numSteps = 0
