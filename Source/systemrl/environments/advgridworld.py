@@ -34,7 +34,7 @@ class AdvGridworld:
         os.chdir(os.path.split(__file__)[0])
         fileName = ""
         if selection == 1:
-            fileName = "grids/gridworld1.p"
+            fileName = "/grids/gridworld1.p"
         elif selection == 2:
             fileName = "grids/gridworld2.p" #TODO: implement
         else:
@@ -79,7 +79,6 @@ class AdvGridworld:
     7 - Up+Left
     '''
     def step(self, action):
-        #print(self.state)
         stepReward = 0
         self._action = action
         actionCheck = self.movements[action]
