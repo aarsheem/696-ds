@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from systemrl.environments.advgridworld import AdvGridworld
 from systemrl.agents.q_learning import QLearning
+import seaborn as sns
 import os
 import random
 
@@ -33,6 +34,7 @@ def grid_human_co(episodes = 1000, h_agent=None, coagent= None, threshold = 1.0,
         ct =0
         actionct = 0
         misstepct = 0
+        heatmap[0,0] += 1
         while (not grid.isEnd):# and (grid.numSteps <=200):
             state = grid.state
             width = grid.getBoardDim()[0]
@@ -120,8 +122,9 @@ def grid_human_co(episodes = 1000, h_agent=None, coagent= None, threshold = 1.0,
         if h_agent is not None:
             plt.figure()
             print(heatmap)
-            plt.imshow(heatmap, cmap='hot', interpolation='nearest')
-            plt.show()
+            plt.imshow(heatmap, cmap='cool', interpolation='nearest')
+            plt.savefig('two.png')
+
     return rewards, actionsctli
 
 def rl_alone(episodes = 1000, fill_table = False):
@@ -227,13 +230,15 @@ def q_human(episodes = 1000, fill_table = False):
     return rewards, agent
 
 if __name__ == "__main__":
-    """_, h_agent = q_human(episodes=1000, fill_table=True)
+    _, h_agent = q_human(episodes=1000, fill_table=True)
     print()
     for y in range(7):
         for x in range(7):
             state_ind = y*(7)+x
             q = h_agent.get_q_values(state_ind)
-            print(state_ind, [x,y], np.around(q, decimals=5))"""
+            print(state_ind, [x,y], np.around(q, decimals=5))
+    grid_human_co(h_agent=h_agent)
+    """
     _, rl_agent = rl_alone(1000, fill_table = True)
     print()
     for y in range(7):
@@ -242,7 +247,7 @@ if __name__ == "__main__":
             q = rl_agent.get_q_values(state_ind)
             print(state_ind, [x,y], np.around(q, decimals=5))
 
-    """in_li = []
+    in_li = []
     r_li = []
     #takes a while because of better closest action search loops
     for i in np.arange(0.1, 1.025, 0.025):
@@ -270,7 +275,7 @@ if __name__ == "__main__":
     plt.ylabel('Average reward')
     plt.savefig("overiderewardstwo.png")"""
 
-    print()
+    """print()
     in_li = []
     r_li = []
     for i in np.arange(0.0, 1.01, 0.01):
@@ -297,7 +302,7 @@ if __name__ == "__main__":
     plt.title('Q-Value Difference with Closest Action Rewards')
     plt.xlabel('Multi threshold')
     plt.ylabel('Average reward')
-    plt.savefig("qmdiffrewardstwo.png")
+    plt.savefig("qmdiffrewardstwo.png")"""
 
     #grid_human_co(h_agent=h_agent,coagent=rl_agent,mode='q-neg')
     print()
