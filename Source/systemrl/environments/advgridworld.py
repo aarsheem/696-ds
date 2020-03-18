@@ -1,9 +1,10 @@
 import numpy as np
 import pickle
+from Source.systemrl.environments.obstacle import Obstacle
 
 class AdvGridworld:
 
-    def __init__(self):
+    def __init__(self, grid):
         self.boardDim = ""
         self.startState = ""
         self.endState = ""
@@ -15,7 +16,11 @@ class AdvGridworld:
         self._currentState = None
         self._rewards = 0
         self._inTerminal = False
-        self.getGrid(2)
+        #door list
+        self._doors = ""
+        #breakable list
+        self._breakList = ""
+        self.getGrid(grid)
         self._name = "Advanced Gridworld"
         self._action = None
         self._gamma = 1
@@ -38,9 +43,11 @@ class AdvGridworld:
         if selection == 1:
             fileName = "grids/gridworld1.p"
         elif selection == 2:
-            fileName = "grids/gridworld2.p" #TODO: implement
+            fileName = "grids/gridworld2.p"
+        elif selection == 3:
+            fileName = "grids/gridworld3.p"
         else:
-            fileName = "grids/gridworld3.p" #TODO: implement
+            fileName = "grids/gridworld4.p"
         gridData = pickle.load(open(fileName, "rb"))
         self.generateGrid(gridData)
 
@@ -66,7 +73,8 @@ class AdvGridworld:
         self.fT = fT
         self.obst = gridInfo["obs"]
         self.keyLoc = gridInfo["key"]
-        self.doorLoc = gridInfo["door"]
+        self._doors = gridInfo["door"]
+        self._breakList = gridInfo["break"]
 
     '''
     step will try to take a given action. If the action is unavailable, the player will
@@ -81,6 +89,8 @@ class AdvGridworld:
     5 - Down+Right
     6 - Down+Left
     7 - Up+Left
+    8 - Use (picks up key, and uses it on doors)
+    9 - Break (breaks breakable objects, cool!)
     '''
     def step(self, poten_action):
         if self.stoch:
@@ -126,12 +136,32 @@ class AdvGridworld:
                 newState = [curState[0] - 1, curState[1] - 1]
             #Key Pick Up & Usage
             elif action == 8:
-                if self._currentState in self.keyLoc:
+                if self._currentState == self.keyLoc:
                     self.hasKey = True
                     newState = self._currentState
-                elif tuple(self._currentState) in self.doorLoc.keys() and self.hasKey:
-                    self.doorRemoval(self._currentState)
+                elif self.hasKey:
+                    for door in self._doors:
+                        if door.checkLocation(self._currentState):
+                            remove = door.getBlockedPaths()
+                            self.removeBlock(remove)
+                            remove = self._doors.index(door)
+                            self._doors.pop(remove)
+                            newState = self._currentState
+                        else:
+                            newState = self._currentState
+                else:
                     newState = self._currentState
+            #Break an object
+            elif action == 9:
+                for obstacle in self._breakList:
+                    if obstacle.checkLocation(self._currentState):
+                        remove = obstacle.getBlockedPaths()
+                        self.removeBlock(remove)
+                        remove = self._breakList.index(obstacle)
+                        self._breakList.pop(remove)
+                        newState = self._currentState
+                    else:
+                        newState = self._currentState
             self._currentState = newState
             stepReward = self.rewardCheck()
             self._rewards += stepReward
@@ -141,37 +171,18 @@ class AdvGridworld:
         return self._currentState, stepReward, self._inTerminal
 
     '''
-    doorRemoval takes an action and the coordinate, then removes both blockages
-    that the door creates.
+    removeBlock takes a dictionary of forbidden transitions and removes them.
     '''
-    def doorRemoval(self, state):
-        #Doors block two paths, so both need to be removed.
-        #Up (0) and Down (2) - Left (3) and Right (1)
-        obstToRemove = self.doorLoc[tuple(state)]
-        if obstToRemove == "down":
-            self.obstacleRemoval(state, obstToRemove)
-            otherDoor = [state[0], state[1]+1]
-            self.obstacleRemoval(otherDoor, "up")
-        elif obstToRemove == "up":
-            self.obstacleRemoval(state, obstToRemove)
-            otherDoor = [state[0], state[1]-1]
-            self.obstacleRemoval(otherDoor, "down")
-        elif obstToRemove == "left":
-            self.obstacleRemoval(state, obstToRemove)
-            otherDoor = [state[0]-1, state[1]]
-            self.obstacleRemoval(otherDoor, "right")
-        else:
-            self.obstacleRemoval(state, obstToRemove)
-            otherDoor = [state[0]+1, state[1]]
-            self.obstacleRemoval(otherDoor, "left")
+    def removeBlock(self, blocked):
+        actionList = blocked.keys()
+        for action in actionList:
+            coord = blocked[action]
+            oldForbid = self.fT[action]
+            removeInd = oldForbid.index(coord)
+            oldForbid.pop(removeInd)
+            newForbid = oldForbid
+            self.fT[action] = newForbid
 
-
-    def obstacleRemoval(self, state, action):
-        oldForbid = self.fT[action]
-        removeInd = oldForbid.index(state)
-        oldForbid.pop(removeInd)
-        newForbid = oldForbid
-        self.fT[action] = newForbid
 
 
     '''
@@ -271,3 +282,4 @@ class AdvGridworld:
                 return action
         else:
             return np.random.choice([0, 1, 2, 3, 8, 9], 1)[0]
+
