@@ -44,13 +44,13 @@ class AdvGridworld:
         os.chdir(os.path.split(__file__)[0])
         fileName = ""
         if selection == 1:
-            fileName = "grids/gridworld1.p"
+            fileName = "/grids/gridworld1.p"
         elif selection == 2:
-            fileName = "grids/gridworld2.p"
+            fileName = "/grids/gridworld2.p"
         elif selection == 3:
-            fileName = "grids/gridworld3.p"
+            fileName = "/grids/gridworld3.p"
         else:
-            fileName = "grids/gridworld4.p"
+            fileName = "/grids/gridworld4.p"
         gridData = pickle.load(open(fileName, "rb"))
         self.generateGrid(gridData)
 
@@ -224,11 +224,15 @@ class AdvGridworld:
     def gamma(self) -> float:
         return self._gamma
 
+    #Currently set to 6 actions because Gridworld 2/3/4 cannot use diagonal movement.
     def numActions(self):
-        return 8
+        return 6
 
     def getBoardDim(self):
         return self.boardDim
+
+    def numSteps(self) -> int:
+        return self._numSteps
 
     '''
     reset resets the grid to the original start position, removes any rewards, and sets terminal check status to false.
