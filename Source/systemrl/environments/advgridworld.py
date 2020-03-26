@@ -1,25 +1,35 @@
 import numpy as np
 import pickle
 import os
+from Source.systemrl.environments.obstacle import Obstacle
 
 class AdvGridworld:
 
-    def __init__(self):
+    def __init__(self, grid):
         self.boardDim = ""
         self.startState = ""
         self.endState = ""
         self.fT = ""
         self.obst = ""
+        self.keyLoc = ""
         self.movements = {0: 'up', 1: 'right', 2: 'down', 3: 'left', 4: 'upri', 5: 'dori',
-                 6: 'dole', 7: 'uple'}
+                 6: 'dole', 7: 'uple', 8: 'use', 9: 'break'}
         self._currentState = None
         self._rewards = 0
         self._inTerminal = False
-        self.getGrid(1)
+        #door list
+        self._doors = ""
+        #breakable list
+        self._breakList = ""
+        self.getGrid(grid)
         self._name = "Advanced Gridworld"
         self._action = None
-        self._gamma = 0.95
+        self._gamma = 1
         self._numSteps = 0
+        #Turn stochastic on (True) or off (False)
+        self.stoch = False
+        #Key mechanic
+        self.hasKey = False
 
     @property
     def name(self) -> str:
@@ -34,11 +44,13 @@ class AdvGridworld:
         os.chdir(os.path.split(__file__)[0])
         fileName = ""
         if selection == 1:
-            fileName = "/grids/gridworld1.p"
+            fileName = "grids/gridworld1.p"
         elif selection == 2:
-            fileName = "grids/gridworld2.p" #TODO: implement
+            fileName = "grids/gridworld2.p"
+        elif selection == 3:
+            fileName = "grids/gridworld3.p"
         else:
-            fileName = "grids/gridworld3.p" #TODO: implement
+            fileName = "grids/gridworld4.p"
         gridData = pickle.load(open(fileName, "rb"))
         self.generateGrid(gridData)
 
@@ -63,6 +75,9 @@ class AdvGridworld:
         fT["uple"] = gridInfo["uple"]
         self.fT = fT
         self.obst = gridInfo["obs"]
+        self.keyLoc = gridInfo["key"]
+        self._doors = gridInfo["door"]
+        self._breakList = gridInfo["break"]
 
     '''
     step will try to take a given action. If the action is unavailable, the player will
@@ -77,19 +92,25 @@ class AdvGridworld:
     5 - Down+Right
     6 - Down+Left
     7 - Up+Left
+    8 - Use (picks up key, and uses it on doors)
+    9 - Break (breaks breakable objects, cool!)
     '''
-    def step(self, action):
+    def step(self, poten_action):
+        if self.stoch:
+            action = self.alterMove(poten_action)
+        else:
+            action = poten_action
         stepReward = 0
         self._action = action
         actionCheck = self.movements[action]
-        if self._currentState not in self.fT[actionCheck] and not self._inTerminal:
+        if action in [8, 9] or self._currentState not in self.fT[actionCheck] and not self._inTerminal:
             newState = ""
             #Up
             if action == 0:
                 curState = self._currentState
                 newState = [curState[0], curState[1] - 1]
             elif action == 1:
-                #Right
+            #Right
                 curState = self._currentState
                 newState = [curState[0] + 1, curState[1]]
             #Down
@@ -116,13 +137,57 @@ class AdvGridworld:
             elif action == 7:
                 curState = self._currentState
                 newState = [curState[0] - 1, curState[1] - 1]
+            #Key Pick Up & Usage
+            elif action == 8:
+                if self._currentState == self.keyLoc:
+                    self.hasKey = True
+                    newState = self._currentState
+                elif self.hasKey:
+                    for door in self._doors:
+                        if door.checkLocation(self._currentState):
+                            remove = door.getBlockedPaths()
+                            self.removeBlock(remove)
+                            remove = self._doors.index(door)
+                            self._doors.pop(remove)
+                            newState = self._currentState
+                        else:
+                            newState = self._currentState
+                else:
+                    newState = self._currentState
+            #Break an object
+            elif action == 9:
+                for obstacle in self._breakList:
+                    if obstacle.checkLocation(self._currentState):
+                        remove = obstacle.getBlockedPaths()
+                        self.removeBlock(remove)
+                        remove = self._breakList.index(obstacle)
+                        self._breakList.pop(remove)
+                        newState = self._currentState
+                    else:
+                        newState = self._currentState
             self._currentState = newState
             stepReward = self.rewardCheck()
             self._rewards += stepReward * (self._gamma**self._numSteps)
         self._numSteps += 1
         if self._currentState == self.endState:
             self._inTerminal = True
+        print(self._currentState)
         return self._currentState, stepReward, self._inTerminal
+
+    '''
+    removeBlock takes a dictionary of forbidden transitions and removes them.
+    '''
+    def removeBlock(self, blocked):
+        actionList = blocked.keys()
+        for action in actionList:
+            coord = blocked[action]
+            oldForbid = self.fT[action]
+            removeInd = oldForbid.index(coord)
+            oldForbid.pop(removeInd)
+            newForbid = oldForbid
+            self.fT[action] = newForbid
+
+
 
     '''
     rewardCheck checks the entered new state to see if there is any reward related to the state.
@@ -159,15 +224,11 @@ class AdvGridworld:
     def gamma(self) -> float:
         return self._gamma
 
-    @property
-    def numSteps(self) -> int:
-        return self._numSteps
+    def numActions(self):
+        return 8
 
     def getBoardDim(self):
         return self.boardDim
-
-    def numActions(self):
-        return 8
 
     '''
     reset resets the grid to the original start position, removes any rewards, and sets terminal check status to false.
@@ -177,4 +238,56 @@ class AdvGridworld:
         self._rewards = 0
         self._inTerminal = False
         self._action = None
+        self.hasKey = False
         self._numSteps = 0
+
+    '''
+    alterMove handles stochasicity within the gridworld.
+    If percentages need to be changed to influence how the actions are changed,
+    update them here!
+    '''
+    def alterMove(self, action):
+        #75% - Do Action / 10% Veer / 10% Veer other way / 5% Random action
+        doAction = 0.75
+        veer = 0.1
+        veerOther = 0.1
+        randomAction = 0.05
+        choice = np.random.choice([0, 1, 2, 3], 1, p=[doAction, veer, veerOther, randomAction])
+        if choice[0] == 0:
+            return action
+        #Veer towards the right
+        elif choice[0] == 1:
+            #Up - 0
+            if action == 0:
+                return 1
+            #Right - 1
+            elif action == 1:
+                return 2
+            #Down - 2
+            elif action == 2:
+                return 3
+            #Left - 3
+            elif action == 3:
+                return 0
+            #Currently assumes use and break are just always input
+            else:
+                return action
+        #Veer towards the left
+        elif choice[0] == 2:
+            #Up - 0
+            if action == 0:
+                return 3
+            #Right - 1
+            elif action == 1:
+                return 0
+            #Down - 2
+            elif action == 2:
+                return 1
+            #Left - 3
+            elif action == 3:
+                return 2
+            else:
+                return action
+        else:
+            return np.random.choice([0, 1, 2, 3, 8, 9], 1)[0]
+
