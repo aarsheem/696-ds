@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import os
 from Source.systemrl.environments.obstacle import Obstacle
 
 class AdvGridworld:
@@ -24,6 +25,7 @@ class AdvGridworld:
         self._name = "Advanced Gridworld"
         self._action = None
         self._gamma = 1
+        self._numSteps = 0
         #Turn stochastic on (True) or off (False)
         self.stoch = False
         #Key mechanic
@@ -39,6 +41,7 @@ class AdvGridworld:
     information that is required to play.
     '''
     def getGrid(self, selection):
+        os.chdir(os.path.split(__file__)[0])
         fileName = ""
         if selection == 1:
             fileName = "grids/gridworld1.p"
@@ -164,7 +167,8 @@ class AdvGridworld:
                         newState = self._currentState
             self._currentState = newState
             stepReward = self.rewardCheck()
-            self._rewards += stepReward
+            self._rewards += stepReward * (self._gamma**self._numSteps)
+        self._numSteps += 1
         if self._currentState == self.endState:
             self._inTerminal = True
         print(self._currentState)
@@ -221,7 +225,10 @@ class AdvGridworld:
         return self._gamma
 
     def numActions(self):
-        return 7
+        return 8
+
+    def getBoardDim(self):
+        return self.boardDim
 
     '''
     reset resets the grid to the original start position, removes any rewards, and sets terminal check status to false.
@@ -232,6 +239,7 @@ class AdvGridworld:
         self._inTerminal = False
         self._action = None
         self.hasKey = False
+        self._numSteps = 0
 
     '''
     alterMove handles stochasicity within the gridworld.
