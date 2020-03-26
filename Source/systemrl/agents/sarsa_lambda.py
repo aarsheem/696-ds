@@ -1,0 +1,52 @@
+import numpy as np
+from collections import defaultdict
+from .td import TD
+
+
+class SARSALambda(TD):
+    def __init__(self, num_actions, gamma, lr, lmbda):
+        self.name = "SARSA Lambda"
+        self.num_actions = num_actions
+        self.q_table = defaultdict(lambda: [0.0] * self.num_actions)
+        self.e = defaultdict(lambda: [0.0] * self.num_actions)
+        self.gamma = gamma
+        self.lr = lr
+        self.state = None
+        self.lmbda = lmbda
+        self.gamma_lambda = self.gamma * self.lmbda
+
+    def name(self):
+        return self.name
+
+    def get_action(self, state):
+        qsa = self.q_table[state]
+        indices = np.where(qsa == np.max(qsa))[0]
+        return np.random.choice(indices)
+
+    def update(self, delta):
+        for s in self.e:
+            for a in range(self.num_actions):
+                self.e[s][a] = self.e[s][a] * self.gamma_lambda
+                self.q_table[s][a] = self.q_table[s][a] + self.lr * self.e[s][a] * delta
+
+    def train(self, state, action, reward, next_state):
+        if self.state is None:
+            self.state = state
+            self.action = action
+            self.reward = reward
+            return
+        delta = self.reward + self.gamma*self.q_table[state][action] - self.q_table[self.state][self.action]
+        self.e[self.state][self.action] = 1.0/self.gamma_lambda 
+        self.update(delta)
+        
+        self.state = state
+        self.action = action
+        self.reward = reward
+
+    def reset(self):
+        delta = self.reward - self.q_table[self.state][self.action]
+        self.e[self.state][self.action] = 1/self.gamma_lambda 
+        self.update(delta)
+        self.e = defaultdict(lambda: [0.0] * self.num_actions)
+        self.state = None
+
