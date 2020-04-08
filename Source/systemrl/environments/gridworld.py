@@ -28,14 +28,15 @@ class Gridworld(Environment):
             0 everywhere else
     """
 
-    def __init__(self, startState=0, endState=24, shape=(5, 5), obstacles=(12, 17), waterStates=(6, 18, 22)):
+    def __init__(self, startState=0, endStates=[24], shape=[5, 5], obstacles=[12, 17], waterStates=[6, 18, 22],waterRewards=[-10,-10,-10]):
         self._name = "Gridworld"
         #todo: what is gamma for?
         self._gamma = 0.99
         self._startState = startState
-        self._endState = endState
+        self._endStates = endStates
         self._waterStates = waterStates
         self._obstacles = obstacles
+        self._waterRewards = waterRewards
 
         self._state = self._startState
         self._action = None
@@ -80,7 +81,7 @@ class Gridworld(Environment):
 
     def nextState(self, state: int, action: int) -> int:
 
-        if state == self._endState or action == 4:
+        if state in self._endStates or action == 4:
             return state
 
         noise = np.random.uniform()
@@ -112,7 +113,7 @@ class Gridworld(Environment):
         nextState = self.nextState(self._state, action)
         self._reward = self.R(int(self._state), action, nextState)
         self._state = nextState
-        self._isEnd = self._state == self._endState
+        self._isEnd = self._state in self._endStates
 
         return self.state, self.reward, self.isEnd
 
@@ -130,14 +131,17 @@ class Gridworld(Environment):
             rdict -- a dictionary mapping integer states to reward values
         """
         rdict = {i: 0 for i in range(0, self._size)}
-        rdict[self._endState] = 10
-        for w in self._waterStates: rdict[w] = -10
-        for o in self._obstacles: rdict[o] = None
+        for count, endState in enumerate(self._endStates):
+            rdict[endState] = 10-count
+        for count, waterState in enumerate(self._waterStates):
+            rdict[waterState] = self._waterRewards[count]
+        for o in self._obstacles: 
+            rdict[o] = None
 
         return rdict
 
     def R(self, state: int, action: int, nextState: int) -> float:
-        return 0 if (state == nextState and nextState == self._endState) else self._R[nextState]
+        return 0 if (state == nextState and nextState in self._endStates) else self._R[nextState]
 
     def normState(self):
         """
