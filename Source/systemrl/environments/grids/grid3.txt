@@ -13,14 +13,18 @@ doors = []
 grid['door'] = doors
 breakList = []
 break1 = Obstacle()
-break1.setLocation([[9,2]])
+break1.setLocation([[9,1], [8,2], [9,3]])
 break1.setBlock({"down":[9,1], "right":[8,2], "up":[9,3]})
+break1.setBoolId(0)
 breakList.append(break1)
 break2 = Obstacle()
-break2.setLocation([[9,5]])
+break2.setLocation([[9,4], [8,5], [9,6]])
 break2.setBlock({"down":[9,4], "right":[8,5], "up":[9,6]})
+break2.setBoolId(1)
 breakList.append(break2)
 grid['break'] = breakList
+#breakable, breakable
+grid['bools'] = [False, False]
 grid['upri'] = []
 grid['dori'] = []
 grid['dole'] = []

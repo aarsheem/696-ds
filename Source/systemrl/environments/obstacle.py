@@ -2,6 +2,7 @@ class Obstacle:
     def __init__(self):
         self.location = []
         self.blockedPaths = ""
+        self.boolid = None
 
     def setLocation(self, loc):
         self.location = loc
@@ -17,4 +18,10 @@ class Obstacle:
 
     def getBlockedPaths(self):
         return self.blockedPaths
+
+    def setBoolId(self, ind):
+        self.boolid = ind
+
+    def getBoolId(self):
+        return self.boolid
 
