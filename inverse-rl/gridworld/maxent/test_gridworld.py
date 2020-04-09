@@ -17,20 +17,22 @@ def idx_to_state(env, state):
     return state
     
 def main():
-    env = Gridworld()
     
     episodes, scores = [], []
+    env = Gridworld()
 
-    for episode in range(10):
+    for episode in range(50):
         state = 0
         score = 0
+        env.reset()
+
 
         while True:
             # env.render()
             state_idx = idx_to_state(env, state)
             action = np.argmax(q_table[state_idx])
             next_state, reward, done, _ = env.step(action)
-            
+
             score += reward
             state = next_state
             
@@ -40,6 +42,7 @@ def main():
                 pylab.plot(episodes, scores, 'b')
                 pylab.savefig("./learning_curves/maxent_test.png")
                 break
+
 
         if episode % 1 == 0:
             print('{} episode score is {:.2f}'.format(episode, score))

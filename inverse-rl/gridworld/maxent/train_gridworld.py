@@ -2,6 +2,7 @@ import gym
 import pylab
 import numpy as np
 from gridworld import Gridworld
+import matplotlib.pyplot as plt
 
 from maxent import *
 
@@ -23,7 +24,7 @@ def idx_demo(env, one_feature):
     # env_high = env.observation_space.high   
     # env_distance = (env_high - env_low) / one_feature  
 
-    raw_demo = np.load(file="expert_demo/expert_demo.npy")
+    raw_demo = np.load(file="expert_demo/expert_demo.npy", allow_pickle = True)
     print(raw_demo.shape)
     # demonstrations = np.zeros((len(raw_demo), len(raw_demo[0]), 3))
 
@@ -56,7 +57,6 @@ def update_q_table(state, action, reward, next_state):
 def main():
     env = Gridworld()
     
-    # env = gym.make('MountainCar-v0')
     demonstrations = idx_demo(env, one_feature)
 
     expert = expert_feature_expectations(feature_matrix, demonstrations)
@@ -67,10 +67,12 @@ def main():
     episodes, scores = [], []
 
     for episode in range(30000):
+        env.reset()
         state = 0
         score = 0
 
-        if (episode != 0 and episode == 10000) or (episode > 10000 and episode % 5000 == 0):
+
+        if (episode != 0 and episode == 50) or (episode > 50 and episode % 50 == 0):
             learner = learner_feature_expectations / episode
             maxent_irl(expert, learner, theta, theta_learning_rate)
                 
@@ -80,7 +82,6 @@ def main():
             next_state, reward, done, _ = env.step(action)
             
             irl_reward = get_reward(feature_matrix, theta, n_states, state_idx)
-            print(irl_reward)
             next_state_idx = idx_state(env, next_state)
             update_q_table(state_idx, action, irl_reward, next_state_idx)
             
