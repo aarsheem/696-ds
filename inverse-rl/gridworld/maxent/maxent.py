@@ -17,7 +17,6 @@ def expert_feature_expectations(feature_matrix, demonstrations):
 def maxent_irl(expert, learner, theta, learning_rate):
     gradient = expert - learner
     theta += learning_rate * gradient
-
     # Clip theta
     for j in range(len(theta)):
         if theta[j] > 0:
