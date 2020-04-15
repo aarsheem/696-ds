@@ -2,6 +2,7 @@ import gym
 import pylab
 import numpy as np
 from gridworld import Gridworld
+import matplotlib.pyplot as plt
 
 q_table = np.load(file="results/maxent_q_table.npy") # (400, 3)
 one_feature = 20 # number of state per one feature
@@ -20,8 +21,8 @@ def main():
     
     episodes, scores = [], []
     env = Gridworld()
-
-    for episode in range(50):
+    n = 500
+    for episode in range(n):
         state = 0
         score = 0
         env.reset()
@@ -39,8 +40,10 @@ def main():
             if done:
                 scores.append(score)
                 episodes.append(episode)
-                pylab.plot(episodes, scores, 'b')
-                pylab.savefig("./learning_curves/maxent_test.png")
+                # pylab.plot(episodes, scores, 'b')
+                plt.hist(scores)
+                plt.title("scores in " + str(n)+ " tests")
+                plt.savefig("./learning_curves/maxent_test.png")
                 break
 
 
