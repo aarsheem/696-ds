@@ -1,5 +1,5 @@
 grid = {}
-grid['size'] = [9,9]
+grid['size'] = [10,10]
 grid['start'] = [0,0]
 grid['end'] = [9,9]
 grid['left'] = [[0,0], [0,1], [0,2], [0,3], [0,4], [0,5], [0,6], [0,7], [0,8], [0,9], [1,3], [1,4], [1,5], [1,6], [2,1], [2,8], [3,0], [3,1], [3,2], [3,3], [3,6], [3,7], [4,2], [4,3], [4,7], [4,8], [4,9], [6,0], [6,1], [6,6], [6,7], [6,8], [7,7], [7,8], [7,9], [8,1], [8,8], [9,2], [9,3], [9,5], [9,6], [9,7], [9,4]]
@@ -17,11 +17,16 @@ doors = []
 door1 = Obstacle()
 door1.setLocation([[8,4], [9,4]])
 door1.setBlock({"right":[8,4], "left":[9,4]})
-doors.append(doors)
+door1.setBoolId(1)
+doors.append(door1)
+grid['door'] = doors
 
 #breakable objects
 breakList = []
 grid['break'] = breakList
+
+#key, door, door
+grid['bools'] = [False, False]
 
 grid['door'] = doors
 grid['upri'] = []

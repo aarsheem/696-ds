@@ -13,12 +13,9 @@ def decaying_epsilon(current_episode, total_episodes):
     epsilon = 1/(1+np.exp(power))
     return epsilon
 
-#Actions: up (0), down (1), left (2), right (3), do nothing (4)
-human_policy = [3,1,3,3,1,\
-                3,3,2,3,1,\
-                0,2,0,3,1,\
-                0,1,0,1,2,\
-                0,3,3,2,0]
+def init_human_policy():
+    human_policy = [np.random.random(4) for i in range(25)]
+    return human_policy
 
 def get_performance(env, policy):
     episodes = 100
@@ -37,13 +34,19 @@ def get_performance(env, policy):
         episode_returns.append(returns)
     return np.mean(episode_returns)
 
-
-
 #environment
-env = Gridworld()
+startState=0
+endStates=(24)
+shape=(5,5)
+obstacles=()
+waterStates=tuple(range(1,24))
+waterRewards=(-1,-1,-1,-5,-9,-3,-4,-1,-6,-5,-1,-1,-1,-2,-6,-1,-8,-4,-5,-7,-1,-1,-1)
+env = Gridworld(startState, endStates, shape, obstacles, waterStates, waterRewards)
+
+human_policy = init_human_policy()
 
 num_actions = 4
-gamma = 0.99
+gamma = 1
 learning_rate = 0.01
 lmbda = 0.3
 

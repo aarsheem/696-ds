@@ -12,15 +12,19 @@ class AdvGridworld:
         self.fT = ""
         self.obst = ""
         self.keyLoc = ""
-        self.movements = {0: 'up', 1: 'right', 2: 'down', 3: 'left', 4: 'upri', 5: 'dori',
-                 6: 'dole', 7: 'uple', 8: 'use', 9: 'break'}
+        self.movements = {0: 'up', 1: 'right', 2: 'down', 3: 'left', 4: 'use', 5: 'break'}
+        #self.movements = {0: 'up', 1: 'right', 2: 'down', 3: 'left', 4: 'upri', 5: 'dori', 6: 'dole', 7: 'uple', 8: 'use', 9: 'break'}
         self._currentState = None
         self._rewards = 0
         self._inTerminal = False
+        #Track environment changes
+        self._initBools = ""
+        self._changes = ""
         #door list
         self._doors = ""
         #breakable list
         self._breakList = ""
+        self._gridData = ""
         self.getGrid(grid)
         self._name = "Advanced Gridworld"
         self._action = None
@@ -44,14 +48,15 @@ class AdvGridworld:
         os.chdir(os.path.split(__file__)[0])
         fileName = ""
         if selection == 1:
-            fileName = "/grids/gridworld1.p"
+            fileName = "grids/gridworld1.p"
         elif selection == 2:
-            fileName = "/grids/gridworld2.p"
+            fileName = "grids/gridworld2.p"
         elif selection == 3:
-            fileName = "/grids/gridworld3.p"
+            fileName = "grids/gridworld3.p"
         else:
-            fileName = "/grids/gridworld4.p"
+            fileName = "grids/gridworld4.p"
         gridData = pickle.load(open(fileName, "rb"))
+        self._gridData = gridData
         self.generateGrid(gridData)
 
     '''
@@ -78,6 +83,8 @@ class AdvGridworld:
         self.keyLoc = gridInfo["key"]
         self._doors = gridInfo["door"]
         self._breakList = gridInfo["break"]
+        self._initBools = gridInfo["bools"]
+        self._changes = self._initBools
 
     '''
     step will try to take a given action. If the action is unavailable, the player will
@@ -103,7 +110,7 @@ class AdvGridworld:
         stepReward = 0
         self._action = action
         actionCheck = self.movements[action]
-        if action in [8, 9] or self._currentState not in self.fT[actionCheck] and not self._inTerminal:
+        if action in [4, 5] or self._currentState not in self.fT[actionCheck] and not self._inTerminal:
             newState = ""
             #Up
             if action == 0:
@@ -121,31 +128,18 @@ class AdvGridworld:
             elif action == 3:
                 curState = self._currentState
                 newState = [curState[0] - 1, curState[1]]
-            #Up and Right
-            elif action == 4:
-                curState = self._currentState
-                newState = [curState[0] + 1, curState[1] - 1]
-            #Down and Right
-            elif action == 5:
-                curState = self._currentState
-                newState = [curState[0] + 1, curState[1] + 1]
-            #Down and Left
-            elif action == 6:
-                curState = self._currentState
-                newState = [curState[0] - 1, curState[1] + 1]
-            #Up and Left
-            elif action == 7:
-                curState = self._currentState
-                newState = [curState[0] - 1, curState[1] - 1]
             #Key Pick Up & Usage
-            elif action == 8:
+            elif action == 4:
                 if self._currentState == self.keyLoc:
                     self.hasKey = True
+                    self._changes[0] = True
                     newState = self._currentState
                 elif self.hasKey:
                     for door in self._doors:
                         if door.checkLocation(self._currentState):
                             remove = door.getBlockedPaths()
+                            boolIndx = door.getBoolId()
+                            self._changes[boolIndx] = True
                             self.removeBlock(remove)
                             remove = self._doors.index(door)
                             self._doors.pop(remove)
@@ -155,24 +149,47 @@ class AdvGridworld:
                 else:
                     newState = self._currentState
             #Break an object
-            elif action == 9:
+            elif action == 5:
                 for obstacle in self._breakList:
                     if obstacle.checkLocation(self._currentState):
                         remove = obstacle.getBlockedPaths()
+                        boolIndx = obstacle.getBoolId()
+                        self._changes[boolIndx] = True
                         self.removeBlock(remove)
                         remove = self._breakList.index(obstacle)
                         self._breakList.pop(remove)
                         newState = self._currentState
                     else:
                         newState = self._currentState
+            if len(newState) < 1:
+                newState = self._currentState
             self._currentState = newState
             stepReward = self.rewardCheck()
             self._rewards += stepReward * (self._gamma**self._numSteps)
         self._numSteps += 1
         if self._currentState == self.endState:
             self._inTerminal = True
-        print(self._currentState)
-        return self._currentState, stepReward, self._inTerminal
+        return self.state, stepReward, self._inTerminal
+
+    #diagonal stuff had to be moved because python is a bad language
+    '''
+    #Up and Right
+    elif action == 4:
+        curState = self._currentState
+        newState = [curState[0] + 1, curState[1] - 1]
+    #Down and Right
+    elif action == 5:
+        curState = self._currentState
+        newState = [curState[0] + 1, curState[1] + 1]
+    #Down and Left
+    elif action == 6:
+        curState = self._currentState
+        newState = [curState[0] - 1, curState[1] + 1]
+    #Up and Left
+    elif action == 7:
+        curState = self._currentState
+        newState = [curState[0] - 1, curState[1] - 1]
+    '''
 
     '''
     removeBlock takes a dictionary of forbidden transitions and removes them.
@@ -214,7 +231,8 @@ class AdvGridworld:
 
     @property
     def state(self) -> []:
-        return self._currentState
+        fullState = [self._currentState] + self._changes
+        return tuple(fullState)
 
     @property
     def isEnd(self) -> bool:
@@ -234,6 +252,9 @@ class AdvGridworld:
     def numSteps(self) -> int:
         return self._numSteps
 
+    def numEnvChanges(self):
+        return len(self._changes)
+
     '''
     reset resets the grid to the original start position, removes any rewards, and sets terminal check status to false.
     '''
@@ -244,6 +265,11 @@ class AdvGridworld:
         self._action = None
         self.hasKey = False
         self._numSteps = 0
+        self.obst = self._gridData["obs"]
+        self.keyLoc = self._gridData["key"]
+        self._doors = self._gridData["door"]
+        self._breakList = self._gridData["break"]
+        self._changes = self._initBools
 
     '''
     alterMove handles stochasicity within the gridworld.
@@ -293,5 +319,5 @@ class AdvGridworld:
             else:
                 return action
         else:
-            return np.random.choice([0, 1, 2, 3, 8, 9], 1)[0]
+            return np.random.choice([0, 1, 2, 3, 4, 5], 1)[0]
 
