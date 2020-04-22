@@ -25,7 +25,7 @@ grid['door'] = doors
 breakList = []
 grid['break'] = breakList
 
-#key, door, door
+#key, door
 grid['bools'] = [False, False]
 
 grid['door'] = doors

@@ -28,10 +28,10 @@ class AdvGridworld:
         self.getGrid(grid)
         self._name = "Advanced Gridworld"
         self._action = None
-        self._gamma = 1
+        self._gamma = 0.99
         self._numSteps = 0
         #Turn stochastic on (True) or off (False)
-        self.stoch = False
+        self.stoch = True
         #Key mechanic
         self.hasKey = False
 
@@ -166,6 +166,8 @@ class AdvGridworld:
             self._currentState = newState
             stepReward = self.rewardCheck()
             self._rewards += stepReward * (self._gamma**self._numSteps)
+            if (self._rewards) > 0:
+                print(self._rewards)
         self._numSteps += 1
         if self._currentState == self.endState:
             self._inTerminal = True
@@ -212,9 +214,9 @@ class AdvGridworld:
     '''
     def rewardCheck(self):
         if self._currentState in self.obst:
-            return -10
+            return -50
         elif self._currentState == self.endState:
-            return 10
+            return 100
         else:
             return 0
 
@@ -231,7 +233,8 @@ class AdvGridworld:
 
     @property
     def state(self) -> []:
-        fullState = [self._currentState] + self._changes
+        stateId = self.convertBoolToInt()
+        fullState = [self._currentState, stateId]
         return tuple(fullState)
 
     @property
@@ -254,6 +257,11 @@ class AdvGridworld:
 
     def numEnvChanges(self):
         return len(self._changes)
+
+    def getStart(self):
+        stateId = self.convertBoolToInt()
+        starting = [self.startState, stateId]
+        return starting
 
     '''
     reset resets the grid to the original start position, removes any rewards, and sets terminal check status to false.
@@ -321,3 +329,11 @@ class AdvGridworld:
         else:
             return np.random.choice([0, 1, 2, 3, 4, 5], 1)[0]
 
+    def convertBoolToInt(self):
+        stringNum = ""
+        for bo in self._changes:
+            if bo == True:
+                stringNum = stringNum + str(2)
+            else:
+                stringNum = stringNum + str(1)
+        return int(stringNum)

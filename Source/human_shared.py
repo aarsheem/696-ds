@@ -11,7 +11,7 @@ def grid_human_co(episodes = 1000, h_agent=None, coagent= None, threshold = 1.0,
     Default is uniform random actions
     """
     path = os.getcwd()
-    grid = AdvGridworld()
+    grid = AdvGridworld(4)
     os.chdir(path)
 
     if h_agent is not None:
@@ -36,10 +36,11 @@ def grid_human_co(episodes = 1000, h_agent=None, coagent= None, threshold = 1.0,
         while (not grid.isEnd):# and (grid.numSteps <=200):
             state = grid.state
             width = grid.getBoardDim()[0]
-            state_ind = state[1]*(width+1)+state[0]
+            state_ind = state[0][1]*(width)+state[0][0]
+            init_state = (state_ind, state[1:])
 
             #'up','right','down','left','upri','dori','dole','uple'
-            actions = [0, 1, 2, 3, 4, 5, 6, 7]
+            actions = [0, 1, 2, 3, 4, 5]
             #if we have a special human agent, use it
             if h_agent is None:
                 action = np.random.choice(actions, 1)[0]
@@ -54,7 +55,8 @@ def grid_human_co(episodes = 1000, h_agent=None, coagent= None, threshold = 1.0,
                 human_q = q_vals[action]
 
                 #closest actions dictionary
-                closest_a = {0:[4,7],1:[4,5],2:[5,6],3:[6,7],4:[0,1],5:[1,2],6:[2,3],7:[0,3]}
+                #closest_a = {0:[4,7],1:[4,5],2:[5,6],3:[6,7],4:[0,1],5:[1,2],6:[2,3],7:[0,3]}
+                closest_a = {0: [1, 3], 1: [0, 2], 2: [3, 1], 3: [2, 0], 4: [5, 1], 5: [4, 1]}
 
                 #co-pilot action choices
                 #override to optimal if suboptimal action selected
@@ -95,7 +97,8 @@ def grid_human_co(episodes = 1000, h_agent=None, coagent= None, threshold = 1.0,
             if h_agent is not None:
                 heatmap[grid.state[1],grid.state[0]] += 1
                 new_state = grid.state
-                new_state_ind = new_state[1]*(width+1)+new_state[0]
+                new_state_ind = new_state[0][1]*(width)+new_state[0][0]
+                new_state_full = (new_state_ind, state[1:])
                 #print(new_state)
                 if (new_state_ind not in [0,1,2,3,10,17,24,23,22,21,28,35,42,43,44,45,46,47,48]):
                     misstepct +=1
@@ -131,12 +134,12 @@ def rl_alone(episodes = 1000, fill_table = False):
     Returns the trained agent
     """
     path = os.getcwd()
-    grid = AdvGridworld()
+    grid = AdvGridworld(3)
     os.chdir(path)
     print(grid.name + ' with Q-Learning Agent')
     gamma = 0.95
     learning_rate = 0.01
-    agent = QLearning(8, gamma, learning_rate)
+    agent = QLearning(6, gamma, learning_rate)
 
     liRewards = []
 
@@ -147,16 +150,21 @@ def rl_alone(episodes = 1000, fill_table = False):
         state = grid.state
         width = grid.getBoardDim()[0]
         while not grid.isEnd:
-            state_ind = state[1]*(width+1)+state[0]
+            state_ind = state[0][1]*(width)+state[0][0]
+            #new
+            init_state = (state_ind, state[1:])
             if fill_table:
-                actions = [0, 1, 2, 3, 4, 5, 6, 7]
+                actions = [0, 1, 2, 3, 4, 5]
                 action = np.random.choice(actions, 1)[0]
             else:
                 action = agent.get_action(state_ind)
             next_state, reward, is_end = grid.step(action)
-            next_state_ind = next_state[1]*(width+1)+next_state[0]
+            next_state_ind = next_state[0][1]*(width)+next_state[0][0]
+            #new
+            next_state_full = (next_state_ind, state[1:])
             agent.train(state_ind, action, reward, next_state_ind)
             state = next_state
+            #print(state)
         #print(i, grid.reward)
         liRewards.append(grid.reward)
     rewards = np.array(liRewards)
@@ -177,7 +185,7 @@ def q_human(episodes = 1000, fill_table = False):
     Returns the trained agent
     """
     path = os.getcwd()
-    grid = AdvGridworld()
+    grid = AdvGridworld(1)
     os.chdir(path)
     print(grid.name + ' with Q-Learning Human Agent')
     gamma = 0.95

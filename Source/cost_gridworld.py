@@ -6,6 +6,7 @@ from systemrl.agents.sarsa_lambda import SARSALambda
 from systemrl.agents.q_learning import QLearning
 from systemrl.agents.q_lambda import QLambda
 from tqdm import tqdm
+from systemrl.environments.advgridworld import AdvGridworld
 
 #decaying epsilon method for epsilon-greedy poilcy
 def decaying_epsilon(current_episode, total_episodes):
