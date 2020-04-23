@@ -45,7 +45,7 @@ class AdvGridworld:
     information that is required to play.
     '''
     def getGrid(self, selection):
-        os.chdir(os.path.split(__file__)[0])
+        ##os.chdir(os.path.split(__file__)[0])
         fileName = ""
         if selection == 1:
             fileName = "grids/gridworld1.p"
@@ -55,7 +55,9 @@ class AdvGridworld:
             fileName = "grids/gridworld3.p"
         else:
             fileName = "grids/gridworld4.p"
-        gridData = pickle.load(open(fileName, "rb"))
+        with open(fileName, 'rb') as f:
+            gridData = pickle.load(f)
+        #gridData = pickle.load(open(fileName, "rb"))
         self._gridData = gridData
         self.generateGrid(gridData)
 
@@ -166,8 +168,6 @@ class AdvGridworld:
             self._currentState = newState
             stepReward = self.rewardCheck()
             self._rewards += stepReward * (self._gamma**self._numSteps)
-            if (self._rewards) > 0:
-                print(self._rewards)
         self._numSteps += 1
         if self._currentState == self.endState:
             self._inTerminal = True
