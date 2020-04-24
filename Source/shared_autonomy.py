@@ -43,4 +43,4 @@ def shared_autonomy(env, human_policy, q_star, alpha, num_episodes=100, max_step
             returns += reward
         episode_returns.append(returns)
         interventions.append(inter)
-    return interventions, episode_returns
+    return np.mean(interventions), np.mean(episode_returns)

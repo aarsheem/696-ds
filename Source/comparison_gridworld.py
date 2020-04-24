@@ -64,13 +64,8 @@ if not saved_model:
     save_obj(dict(q_star), "q_star")
 else:
     q_star = load_obj("q_star")
-
-q_table = np.load(file="/home/abhik/696-ds/inverse-rl/gridworld/maxent/results/maxent_q_table.npy") # (400, 3)
-q_star = {i: q_table[i] for i in range(len(q_table))}
-
 J_star = np.max(q_star[startState])
 baseline = human_performance
-
 
 shared = []
 nq_cost = []
