@@ -28,7 +28,7 @@ class Gridworld(Environment):
             0 everywhere else
     """
 
-    def __init__(self, startState=0, endStates=[24], shape=[5, 5], obstacles=[12, 17], waterStates=[6, 18, 22],waterRewards=[-10,-10,-10], irl_reward = False):
+    def __init__(self, startState=0, endStates=[24], shape=[5, 5], obstacles=[12, 17], waterStates=[6, 18, 22],waterRewards=[-10,-10,-10]):
         self._name = "Gridworld"
         #todo: what is gamma for?
         self._gamma = 0.99
@@ -53,11 +53,6 @@ class Gridworld(Environment):
         # dicts mapping actions to the appropriate rotations
         self._rotateLeft = {0: 2, 1: 3, 2: 1, 3: 0}
         self._rotateRight = {0: 3, 1: 2, 2: 0, 3: 1}
-        self.irl_reward = irl_reward
-        if self.irl_reward:
-            self.feature_matrix = np.eye((25))
-            self.theta = np.load(file="/home/abhik/696-ds/inverse-rl/gridworld/maxent/results/theta.npy", allow_pickle = True)
-
 
     @property
     def name(self) -> str:
@@ -113,18 +108,10 @@ class Gridworld(Environment):
         else:
             return state
 
-    def get_irl_reward(self, state):
-        irl_rewards = self.feature_matrix.dot(self.theta).reshape((25,))
-        return irl_rewards[state]
-
     def step(self, action: int) -> Tuple[int, float, bool]:
 
         nextState = self.nextState(self._state, action)
-        if self.irl_reward:
-            self._reward = self.get_irl_reward(int(self._state))
-        else:
-            self._reward = self.R(int(self._state), action, nextState)
-
+        self._reward = self.R(int(self._state), action, nextState)
         self._state = nextState
         self._isEnd = self._state in self._endStates
 
