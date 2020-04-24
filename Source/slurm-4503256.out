@@ -1,0 +1,53 @@
++ allCommand=
++ '[' 2 -gt 0 ']'
++ allCommand='  python3 '
++ shift
++ '[' 1 -gt 0 ']'
++ allCommand='   python3  comparison_gridworld.py '
++ shift
++ '[' 0 -gt 0 ']'
++ python3 comparison_gridworld.py
+  0%|          | 0/100 [00:00<?, ?it/s]100%|██████████| 100/100 [00:00<00:00, 3913.04it/s]evaluating policy
+human performance:  -71.22
+
+eval
+Process Process-2:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/lib64/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/s20aarsheemishr/696-ds/Source/nqcost.py", line 67, in nqcost
+    ans = evaluate_interventions(env, human_policy, agent, True, return_dict)
+  File "/home/s20aarsheemishr/696-ds/Source/helper.py", line 72, in evaluate_interventions
+    while not is_end and count < max_steps:
+TypeError: '<' not supported between instances of 'int' and 'DictProxy'
+eval
+Process Process-3:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/lib64/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/s20aarsheemishr/696-ds/Source/nqcost.py", line 67, in nqcost
+    ans = evaluate_interventions(env, human_policy, agent, True, return_dict)
+  File "/home/s20aarsheemishr/696-ds/Source/helper.py", line 72, in evaluate_interventions
+    while not is_end and count < max_steps:
+TypeError: '<' not supported between instances of 'int' and 'DictProxy'
+eval
+Process Process-4:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.6/multiprocessing/process.py", line 258, in _bootstrap
+    self.run()
+  File "/usr/lib64/python3.6/multiprocessing/process.py", line 93, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/s20aarsheemishr/696-ds/Source/nqcost.py", line 67, in nqcost
+    ans = evaluate_interventions(env, human_policy, agent, True, return_dict)
+  File "/home/s20aarsheemishr/696-ds/Source/helper.py", line 72, in evaluate_interventions
+    while not is_end and count < max_steps:
+TypeError: '<' not supported between instances of 'int' and 'DictProxy'
+{}
+Traceback (most recent call last):
+  File "comparison_gridworld.py", line 109, in <module>
+    plt.plot(nq_cost[0], nq_cost[1], label="nq")
+IndexError: index 0 is out of bounds for axis 0 with size 0

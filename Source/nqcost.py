@@ -26,8 +26,7 @@ def nqcost_old(env, human_policy, min_performance, q2_star, s0, num_episodes, lr
             state = next_state
     return evaluate_interventions(env, human_policy, agent)
 
-def nqcost(env, human_policy, q2_star, gamma, lr, min_performance, num_episodes=100,\
-        max_steps=1000):
+def nqcost(env, human_policy, q2_star, gamma, lr, min_performance, num_episodes=100, max_steps=1000, return_dict=None):
     R2 = []
     R1 = []
     agent = NQLearning(q2_star, gamma, lr, min_performance)
@@ -65,5 +64,8 @@ def nqcost(env, human_policy, q2_star, gamma, lr, min_performance, num_episodes=
     plt.legend()
     plt.show()
     """
-    return evaluate_interventions(env, human_policy, agent, is_update=True)
+    ans = evaluate_interventions(env, human_policy, agent, 500, 1000, True)
+    if return_dict is not None:
+        return_dict[min_performance, lr] = ans
+    return ans
 

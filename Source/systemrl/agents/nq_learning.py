@@ -19,6 +19,12 @@ class NQLearning(TD):
     def name(self):
         return self.name
 
+    def check_action(self, state, action):
+        nq2sa = self.gamma_powert * np.array(self.q2_table[state]) + self.G2
+        if nq2sa[action] >= self.min_performance:
+            return action
+        return self.get_action(state)
+
     def get_action(self, state):
         q1sa = self.q1_table[state]
         nq2sa = self.gamma_powert * np.array(self.q2_table[state]) + self.G2

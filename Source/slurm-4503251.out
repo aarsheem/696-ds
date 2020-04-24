@@ -1,0 +1,13 @@
++ allCommand=
++ '[' 2 -gt 0 ']'
++ allCommand='  python3 '
++ shift
++ '[' 1 -gt 0 ']'
++ allCommand='   python3  comparison_gridworld.py '
++ shift
++ '[' 0 -gt 0 ']'
++ python3 comparison_gridworld.py
+  File "comparison_gridworld.py", line 92
+    p = Process(target=nqcost, args=(env, human_policy, deepcopy(q_star), gamma, lr, min_performance, num_episodes = 1000, max_steps = 1000, return_dict=return_dict))
+                                                                                                                   ^
+SyntaxError: invalid syntax

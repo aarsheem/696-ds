@@ -70,8 +70,11 @@ def evaluate_interventions(env, human_policy, agent, num_episodes=500, \
         count = 0
         while not is_end and count < max_steps:
             count += 1
-            action = agent.get_action(state)
             human_action = human_policy[state]
+            if is_update:
+                action = agent.check_action(state,human_action)
+            else:
+                action = agent.get_action(state)
             if human_action != action:
                 inter += 1
             next_state, reward, is_end = env.step(action)

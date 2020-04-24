@@ -1,0 +1,17 @@
++ allCommand=
++ '[' 2 -gt 0 ']'
++ allCommand='  python3 '
++ shift
++ '[' 1 -gt 0 ']'
++ allCommand='   python3  comparison_gridworld.py '
++ shift
++ '[' 0 -gt 0 ']'
++ python3 comparison_gridworld.py
+  0%|          | 0/100 [00:00<?, ?it/s]100%|██████████| 100/100 [00:00<00:00, 4539.63it/s]evaluating policy
+human performance:  -71.22
+
+{}
+Traceback (most recent call last):
+  File "comparison_gridworld.py", line 109, in <module>
+    plt.plot(nq_cost[0], nq_cost[1], label="nq")
+IndexError: index 0 is out of bounds for axis 0 with size 0
